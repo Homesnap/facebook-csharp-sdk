@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="FacebookClient.cs" company="The Outercurve Foundation">
 //    Copyright (c) 2011, The Outercurve Foundation. 
 //
@@ -426,7 +426,7 @@ namespace Facebook
 
                     path = path ?? string.Empty;
 
-                    if (httpMethod == HttpMethod.Post && path.EndsWith("/videos", StringComparison.OrdinalIgnoreCase))
+                    if (httpMethod == HttpMethod.Post && (path.EndsWith("/videos", StringComparison.OrdinalIgnoreCase) || path.EndsWith("/advideos", StringComparison.OrdinalIgnoreCase)))
                         uriBuilder.Host = UseFacebookBeta ? "graph-video.beta.facebook.com" : "graph-video.facebook.com";
                     else
                         uriBuilder.Host = UseFacebookBeta ? "graph.beta.facebook.com" : "graph.facebook.com";
