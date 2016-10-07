@@ -602,7 +602,8 @@ namespace Facebook
                     throw new ArgumentOutOfRangeException("httpMethod");
             }
 
-            request.ContentType = contentType;
+            if (!string.IsNullOrEmpty(contentType))
+                request.ContentType = contentType;
 
             if (!string.IsNullOrEmpty(etag))
                 request.Headers[HttpRequestHeader.IfNoneMatch] = string.Concat('"', etag, '"');
@@ -655,7 +656,7 @@ namespace Facebook
                     }
                     else if (response.StatusCode == HttpStatusCode.OK && response.ContentType.Contains("text/plain"))
                     {
-                        if (response.ResponseUri.AbsolutePath == "/oauth/access_token")
+                        if (response.ResponseUri.AbsolutePath.EndsWith("/oauth/access_token"))
                         {
                             var body = new JsonObject();
                             foreach (var kvp in responseString.Split('&'))
@@ -795,6 +796,14 @@ namespace Facebook
                     if (error.ContainsKey("error_subcode"))
                         int.TryParse(error["error_subcode"].ToString(), out errorSubcode);
 
+                    string errorUserTitle = null;
+                    if (error.ContainsKey("error_user_title"))
+                        errorUserTitle = (string)error["error_user_title"];
+
+                    string errorUserMsg = null;
+                    if (error.ContainsKey("error_user_msg"))
+                        errorUserMsg = (string)error["error_user_msg"];
+
                     // Check to make sure the correct data is in the response
                     if (!string.IsNullOrEmpty(errorType) && !string.IsNullOrEmpty(errorMessage))
                     {
@@ -807,6 +816,9 @@ namespace Facebook
                         else
                             resultException = new FacebookApiException(errorMessage, errorType, errorCode, errorSubcode);
                     }
+
+                    resultException.ErrorUserTitle = errorUserTitle;
+                    resultException.ErrorUserMsg = errorUserMsg;
                 }
                 else
                 {
